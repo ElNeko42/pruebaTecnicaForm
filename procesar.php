@@ -19,11 +19,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sssss", $nombre, $email, $telefono, $asunto, $comentarios);
   
     
-    if ($stmt->execute()) {
-      echo "Nuevo registro creado.";
-    } else {
-      echo "Error: " . $stmt->error;
-    }
+    // ...
+if ($stmt->execute()) {
+    echo "success"; 
+  } else {
+    echo "Error: " . $stmt->error;
+  }
+  // ...
+  
   
 
     $stmt->close();

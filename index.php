@@ -3,6 +3,7 @@
 <head>
     <title>PHP form</title>
     <link rel="stylesheet" href="estilos/estilos.css">
+    <link rel="stylesheet" href="estilos/modal.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
@@ -13,34 +14,31 @@
         </b>
         <div class="form-row">
             <div class="form-column">
-                <label for="nombre">Nombre *</label>
                 <input type="text" id="nombre" name="nombre" placeholder="Nombre *" required>
             </div>
             <div class="form-column">
-                <label for="email">Email *</label>
-                <input type="email" id="email" name="email" required>
+
+                <input type="email" id="email" name="email" placeholder="Email *" required>
             </div>
         </div>
         <div class="form-row">
             <div class="form-column">
-                <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" name="telefono">
+                <input type="tel" id="telefono" name="telefono" placeholder="Teléfono">
             </div>
             <div class="form-column">
-                <label for="asunto">Asunto</label>
-                <input type="text" id="asunto" name="asunto">
+
+                <input type="text" id="asunto" name="asunto" placeholder="Asunto">
             </div>
         </div>
         <div class="form-row">
             <div class="form-column full-width">
-                <label for="comentarios">Comentarios *</label>
-                <textarea id="comentarios" name="comentarios" required></textarea>
+                <textarea id="comentarios" name="comentarios" placeholder="Comentarios" required></textarea>
             </div>
         </div>
         <div class="form-row checkbox-row">
             <div class="form-column full-width checkbox-container">
                 <input type="checkbox" id="politica" name="politica" required>
-                <label for="politica">He leído y acepto la política de privacidad.</label>
+                <label for="politica">He leído y acepto la <a style="color:#0a8eb3 ;">política de privacidad</a></label>
                 </input>
             </div>
         </div>
@@ -51,26 +49,40 @@
         </div>
     </form>
 
-    <div id="formResponse" style="display: none;"></div>
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Tu mensaje ha sido enviado correctamente.</p>
+        </div>
+    </div>
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#contactForm').on('submit', function(e) {
-                e.preventDefault(); // Evitar el envío tradicional del formulario
+                e.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: 'procesar.php',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        // Aquí activas el modal en vez de mostrar la respuesta directamente
+                        $('#successModal').show();
+                    }
+                });
+            });
 
-                // Verificar si el formulario es válido
-                if (this.checkValidity()) {
-                    $.ajax({
-                        type: 'POST',
-                        url: 'procesar.php', // Archivo PHP que procesará los datos
-                        data: $(this).serialize(),
-                        success: function(response) {
-                            $('#formResponse').html(response); // Muestra la respuesta del servidor
-                        }
-                    });
-                } else {
-                    $('#formResponse').html('<p>Por favor, complete todos los campos requeridos.</p>');
+            // Cuando el usuario hace clic en <span> (x), cierra el modal
+            $('.close').on('click', function() {
+                $('#successModal').hide();
+                $('#contactForm').trigger('reset');
+            });
+
+            // Cuando el usuario hace clic en cualquier lugar fuera del modal, ciérralo
+            $(window).on('click', function(event) {
+                if ($(event.target).is('#successModal')) {
+                    $('#successModal').hide();
                 }
             });
         });
